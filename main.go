@@ -13,6 +13,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	_ "net/http/pprof"
 )
 
 func init() {
@@ -37,8 +39,8 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/login", service.Login)
-	router.POST("/todo", middleware.TokenAuthMiddleware(), service.CreateTodo)
-	router.POST("/logout", middleware.TokenAuthMiddleware(), service.Logout)
+	router.POST("/todo", middleware.TokenAuthMiddleware(service), service.CreateTodo)
+	router.POST("/logout", middleware.TokenAuthMiddleware(service), service.Logout)
 	router.POST("/refresh", service.Refresh)
 
 	srv := &http.Server{

@@ -7,6 +7,7 @@ import (
 	"github.com/twinj/uuid"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -40,10 +41,12 @@ func NewToken() *tokenService {
 func (t *tokenService) CreateToken(userID string) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	td.AccessUuid = uuid.NewV4().String()
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	accessTTL, _ := strconv.Atoi(os.Getenv("ACCESS_TOKEN_TTL"))
+	td.AtExpires = time.Now().Add(time.Minute * time.Duration(accessTTL)).Unix()
 
 	td.RefreshUuid = td.AccessUuid + "++" + userID
-	td.RtExpires = time.Now().Add(time.Hour * 1).Unix()
+	refreshTTL, _ := strconv.Atoi(os.Getenv("REFRESH_TOKEN_TTL"))
+	td.RtExpires = time.Now().Add(time.Hour * time.Duration(refreshTTL)).Unix()
 
 	var err error
 	atClaims := jwt.MapClaims{}

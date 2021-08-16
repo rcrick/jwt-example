@@ -54,7 +54,7 @@ func (s *service) FetchAuth(tokenUuid string) (string, error) {
 
 func (s *service) DeleteTokens(authD *AccessDetails) error {
 	refreshUuid := fmt.Sprintf("%s++%s", authD.TokenUuid, authD.UserId)
-	existErr , err:= s.client.Exists(authD.TokenUuid, refreshUuid).Result()
+	existErr, err := s.client.Exists(authD.TokenUuid, refreshUuid).Result()
 	if existErr != 2 {
 		return err
 	}
@@ -75,8 +75,11 @@ func (s *service) DeleteTokens(authD *AccessDetails) error {
 
 func (s *service) DeleteRefresh(refreshUuid string) error {
 	deleted, err := s.client.Del(refreshUuid).Result()
-	if err != nil || deleted == 0 {
+	if err != nil {
 		return err
+	}
+	if deleted == 0 {
+		return errors.New("DeleteRefresh failed")
 	}
 	return nil
 }
